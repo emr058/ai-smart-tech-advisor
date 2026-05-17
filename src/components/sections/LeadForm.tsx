@@ -34,50 +34,50 @@ const initialFormData: LeadFormData = {
 };
 
 export function LeadForm() {
-  const [formData, setFormData] = useState<LeadFormData>(initialFormData);
-  const [submittedData, setSubmittedData] = useState<LeadFormData | null>(null);
-
-  function updateField(field: keyof LeadFormData, value: string) {
-    setFormData((current) => ({
-      ...current,
-      [field]: value,
-    }));
-  }
-
-  const [isSubmitting, setIsSubmitting] = useState(false);
-const [submitMessage, setSubmitMessage] = useState<string | null>(null);
-
-async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
-  event.preventDefault();
-
-  try {
-    setIsSubmitting(true);
-    setSubmitMessage(null);
-
-    const response = await fetch("/api/leads", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(formData),
-    });
-
-    const result = await response.json();
-
-    if (!response.ok || !result.success) {
-      throw new Error(result.error || "Form gönderilemedi.");
+    const [formData, setFormData] = useState<LeadFormData>(initialFormData);
+    const [submittedData, setSubmittedData] = useState<LeadFormData | null>(null);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [submitMessage, setSubmitMessage] = useState<string | null>(null);
+  
+    function updateField(field: keyof LeadFormData, value: string) {
+      setFormData((current) => ({
+        ...current,
+        [field]: value,
+      }));
     }
-
-    setSubmittedData(formData);
-    setSubmitMessage("Talebiniz başarıyla kaydedildi.");
-    setFormData(initialFormData);
-  } catch (error) {
-    console.error(error);
-    setSubmitMessage("Bir hata oluştu. Lütfen tekrar deneyin.");
-  } finally {
-    setIsSubmitting(false);
-  }
-}
+  
+    async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+      event.preventDefault();
+  
+      try {
+        setIsSubmitting(true);
+        setSubmitMessage(null);
+  
+        const response = await fetch("/api/leads", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(formData),
+        });
+  
+        const result = await response.json();
+  
+        if (!response.ok || !result.success) {
+          throw new Error(result.error || "Form gönderilemedi.");
+        }
+  
+        setSubmittedData(formData);
+        setSubmitMessage("Talebiniz başarıyla kaydedildi.");
+        setFormData(initialFormData);
+      } catch (error) {
+        console.error(error);
+        setSubmitMessage("Bir hata oluştu. Lütfen tekrar deneyin.");
+      } finally {
+        setIsSubmitting(false);
+      }
+    }
+  
 
   return (
     <section id="on-analiz" className="mx-auto max-w-6xl px-6 py-16">
