@@ -12,6 +12,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 
+
+
+
 type LeadFormData = {
   name: string;
   contact: string;
@@ -41,16 +44,40 @@ export function LeadForm() {
     }));
   }
 
-  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+const [submitMessage, setSubmitMessage] = useState<string | null>(null);
+
+async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+  event.preventDefault();
+
+  try {
+    setIsSubmitting(true);
+    setSubmitMessage(null);
+
+    const response = await fetch("/api/leads", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(formData),
+    });
+
+    const result = await response.json();
+
+    if (!response.ok || !result.success) {
+      throw new Error(result.error || "Form gönderilemedi.");
+    }
 
     setSubmittedData(formData);
-
-    // Sonraki aşamada burası Supabase / Google Sheets / API route'a bağlanacak.
-    console.log("New lead:", formData);
-
+    setSubmitMessage("Talebiniz başarıyla kaydedildi.");
     setFormData(initialFormData);
+  } catch (error) {
+    console.error(error);
+    setSubmitMessage("Bir hata oluştu. Lütfen tekrar deneyin.");
+  } finally {
+    setIsSubmitting(false);
   }
+}
 
   return (
     <section id="on-analiz" className="mx-auto max-w-6xl px-6 py-16">
@@ -181,9 +208,15 @@ export function LeadForm() {
                 />
               </div>
 
-              <Button type="submit" size="lg">
-                Ön Analiz Talebi Gönder
-              </Button>
+              <Button type="submit" size="lg" disabled={isSubmitting}>
+                    {isSubmitting ? "Gönderiliyor..." : "Ön Analiz Talebi Gönder"}
+                </Button>
+
+                {submitMessage && (
+                    <p className="text-sm font-medium text-muted-foreground">
+                        {submitMessage}
+                    </p>
+                    )}
             </form>
           </CardContent>
         </Card>
