@@ -1,6 +1,7 @@
 import { siteConfig, services, processSteps } from "@/lib/constants";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { LeadForm } from "@/components/sections/LeadForm";
 
 export default function Home() {
   return (
@@ -24,7 +25,9 @@ export default function Home() {
           </p>
 
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-            <Button size="lg">Ön Analiz Al</Button>
+            <Button size="lg" asChild>
+              <a href="#on-analiz">Ön Analiz Al</a>
+            </Button>
             <Button size="lg" variant="outline">
               Hizmetleri Gör
             </Button>
@@ -55,6 +58,7 @@ export default function Home() {
 
       <section className="mx-auto max-w-6xl px-6 py-12">
         <h2 className="text-3xl font-bold">Nasıl Çalışır?</h2>
+        <LeadForm />
 
         <div className="mt-8 grid gap-6 md:grid-cols-3">
           {processSteps.map((step) => (
