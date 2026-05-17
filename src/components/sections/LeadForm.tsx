@@ -11,7 +11,10 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-
+import {
+    getPackageRecommendation,
+    type PackageRecommendation,
+  } from "@/lib/recommendations";
 
 
 
@@ -38,6 +41,8 @@ export function LeadForm() {
     const [submittedData, setSubmittedData] = useState<LeadFormData | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [submitMessage, setSubmitMessage] = useState<string | null>(null);
+    const [recommendation, setRecommendation] =
+        useState<PackageRecommendation | null>(null);
   
     function updateField(field: keyof LeadFormData, value: string) {
       setFormData((current) => ({
@@ -67,11 +72,51 @@ export function LeadForm() {
           throw new Error(result.error || "Form gönderilemedi.");
         }
   
+        const generatedRecommendation = getPackageRecommendation(formData);
+
         setSubmittedData(formData);
+        setRecommendation(generatedRecommendation);
         setSubmitMessage("Talebiniz başarıyla kaydedildi.");
         setFormData(initialFormData);
       } catch (error) {
-        console.error(error);
+        console.error(error);{recommendation && (
+            <div className="mt-6 rounded-lg border bg-background p-4">
+              <p className="text-sm font-medium text-muted-foreground">
+                Önerilen Paket
+              </p>
+          
+              <h3 className="mt-2 text-lg font-semibold">
+                {recommendation.title}
+              </h3>
+          
+              <p className="mt-3 text-sm text-muted-foreground">
+                {recommendation.summary}
+              </p>
+          
+              <div className="mt-4">
+                <p className="text-sm font-medium">Tahmini bütçe:</p>
+                <p className="text-sm text-muted-foreground">
+                  {recommendation.estimatedBudget}
+                </p>
+              </div>
+          
+              <div className="mt-4">
+                <p className="text-sm font-medium">Önerilen bileşenler:</p>
+                <ul className="mt-2 list-inside list-disc space-y-1 text-sm text-muted-foreground">
+                  {recommendation.recommendedDevices.map((device) => (
+                    <li key={device}>{device}</li>
+                  ))}
+                </ul>
+              </div>
+          
+              <div className="mt-4">
+                <p className="text-sm font-medium">Sonraki adım:</p>
+                <p className="text-sm text-muted-foreground">
+                  {recommendation.nextStep}
+                </p>
+              </div>
+            </div>
+          )}
         setSubmitMessage("Bir hata oluştu. Lütfen tekrar deneyin.");
       } finally {
         setIsSubmitting(false);
@@ -247,6 +292,44 @@ export function LeadForm() {
                   {JSON.stringify(submittedData, null, 2)}
                 </pre>
               </div>
+            )}
+            {recommendation && (
+  <div className="mt-6 rounded-lg border bg-background p-4">
+    <p className="text-sm font-medium text-muted-foreground">
+      Önerilen Paket
+    </p>
+
+    <h3 className="mt-2 text-lg font-semibold">
+      {recommendation.title}
+    </h3>
+
+    <p className="mt-3 text-sm text-muted-foreground">
+      {recommendation.summary}
+    </p>
+
+    <div className="mt-4">
+      <p className="text-sm font-medium">Tahmini bütçe:</p>
+      <p className="text-sm text-muted-foreground">
+        {recommendation.estimatedBudget}
+      </p>
+    </div>
+
+    <div className="mt-4">
+      <p className="text-sm font-medium">Önerilen bileşenler:</p>
+      <ul className="mt-2 list-inside list-disc space-y-1 text-sm text-muted-foreground">
+        {recommendation.recommendedDevices.map((device) => (
+          <li key={device}>{device}</li>
+        ))}
+      </ul>
+    </div>
+
+    <div className="mt-4">
+      <p className="text-sm font-medium">Sonraki adım:</p>
+      <p className="text-sm text-muted-foreground">
+        {recommendation.nextStep}
+      </p>
+    </div>
+  </div>
             )}
           </CardContent>
         </Card>
